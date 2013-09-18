@@ -22,7 +22,7 @@ plugin_load(PurplePlugin *plugin) {
         plugin,
         PURPLE_CALLBACK(receiving_im_msg_cb),
         NULL
-    )
+    );
 
     return TRUE;
 }
@@ -32,7 +32,7 @@ static PurplePluginInfo info = {
     PURPLE_MAJOR_VERSION,
     PURPLE_MINOR_VERSION,
     PURPLE_PLUGIN_STANDARD,
-    PIDGIN_PLUGIN_TYPE,
+    NULL,
     0,
     NULL,
     PURPLE_PRIORITY_DEFAULT,
