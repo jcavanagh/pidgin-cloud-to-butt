@@ -35,6 +35,6 @@ clean:
 	rm -f pidgin-cloud_to_butt.so
 
 pidgin-cloud_to_butt.so:	${SOURCES}
-	${CC} ${LIBPURPLE_CFLAGS} -Wall -pthread ${GLIB_CFLAGS} -I. -g3 -O2 -pipe ${SOURCES} -o pidgin-cloud_to_butt.so -shared -fPIC -DPIC
+	${CC} ${LIBPURPLE_CFLAGS} -Wall -pthread ${GLIB_CFLAGS} -I. -g3 -O2 -pipe ${SOURCES} -o pidgin-cloud_to_butt.so -shared -fPIC -DPIC -D_GNU_SOURCE
 
 release:	pidgin-cloud_to_butt.so
