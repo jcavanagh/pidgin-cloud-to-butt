@@ -8,7 +8,7 @@
 #include "plugin.h"
 #include "version.h"
 
-char *str_replace ( const char *string, const char *substr, const char *replacement ){
+char *str_replace ( const char *string, const char *substr, const char *replacement, gboolean ignore_case){
     char *tok = NULL;
     char *newstr = NULL;
     char *oldstr = NULL;
@@ -18,7 +18,17 @@ char *str_replace ( const char *string, const char *substr, const char *replacem
     if ( substr == NULL || replacement == NULL ) return strdup (string);
     newstr = strdup (string);
     head = newstr;
-    while ( (tok = strstr ( head, substr ))){
+    do {
+        if(ignore_case) {
+            tok = strcasestr ( head, substr );
+        } else {
+            tok = strstr( head, substr );
+        }
+
+        if(!tok) {
+            return newstr;
+        }
+
         oldstr = newstr;
         newstr = malloc ( strlen ( oldstr ) - strlen ( substr ) + strlen ( replacement ) + 1 );
 
@@ -35,18 +45,26 @@ char *str_replace ( const char *string, const char *substr, const char *replacem
         /* move back head right after the last replacement */
         head = newstr + (tok - oldstr) + strlen( replacement );
         free (oldstr);
-    }
+    } while ( tok );
 
     return newstr;
 }
 
 static gboolean receiving_im_msg_cb(PurpleAccount *account, char **sender, char **message, PurpleConversation *conv, PurpleMessageFlags *flags) {
-    char *newMessage = str_replace(*message, "the cloud", "my butt");
+    //Naively try to match case in a few common scenarios
+    //It's a shame I'm terrible at C, or else this could be way cooler and actually solve the general case
+    char *newMessage = str_replace(*message, "the cloud", "my butt", FALSE);
+    newMessage = str_replace(newMessage, "THE CLOUD", "MY BUTT", FALSE);
+    newMessage = str_replace(newMessage, "The Cloud", "My Butt", FALSE);
+    newMessage = str_replace(newMessage, "the Cloud", "my Butt", FALSE);
+    newMessage = str_replace(newMessage, "The cloud", "My butt", FALSE);
+    newMessage = str_replace(newMessage, "Cloud", "Butt", FALSE);
+
+    //Replace all remaining clouds with butts, regardless of case
+    newMessage = str_replace(newMessage, "cloud", "butt", TRUE);
 
     free(*message);
     *message = newMessage;
-
-    purple_conversation_write(conv, "", newMessage, PURPLE_MESSAGE_SYSTEM | PURPLE_MESSAGE_NO_LOG, time(NULL));
 
     return FALSE;
 }
