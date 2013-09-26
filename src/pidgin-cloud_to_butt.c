@@ -50,7 +50,7 @@ char *str_replace ( const char *string, const char *substr, const char *replacem
     return newstr;
 }
 
-static gboolean receiving_im_msg_cb(PurpleAccount *account, char **sender, char **message, PurpleConversation *conv, PurpleMessageFlags *flags) {
+static gboolean receiving_msg_cb(PurpleAccount *account, char **sender, char **message, PurpleConversation *conv, PurpleMessageFlags *flags) {
     //Naively try to match case in a few common scenarios
     //It's a shame I'm terrible at C, or else this could be way cooler and actually solve the general case
     char *newMessage = str_replace(*message, "the cloud", "my butt", FALSE);
@@ -70,14 +70,23 @@ static gboolean receiving_im_msg_cb(PurpleAccount *account, char **sender, char 
 }
 
 static gboolean plugin_load(PurplePlugin *plugin) {
-    //Connect to conversation signal
+    //Connect to conversation signals
     purple_signal_connect(
         purple_conversations_get_handle(), 
         "receiving-im-msg",
         plugin,
-        PURPLE_CALLBACK(receiving_im_msg_cb),
+        PURPLE_CALLBACK(receiving_msg_cb),
         NULL
     );
+
+    purple_signal_connect(
+        purple_conversations_get_handle(), 
+        "receiving-chat-msg",
+        plugin,
+        PURPLE_CALLBACK(receiving_msg_cb),
+        NULL
+    );
+
 
     return TRUE;
 }
@@ -113,7 +122,8 @@ static PurplePluginInfo info = {
     
 static void                        
 init_plugin(PurplePlugin *plugin)
-{                                  
+{
+    //Nothing to do
 }
 
-PURPLE_INIT_PLUGIN(hello_world, init_plugin, info)
+PURPLE_INIT_PLUGIN("pidgin-cloud-to-butt", init_plugin, info)
